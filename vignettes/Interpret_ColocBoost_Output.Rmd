@@ -1,0 +1,345 @@
+---
+title: "Interpret ColocBoost Output"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Interpret ColocBoost Output}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dpi = 80
+)
+```
+
+
+This vignette demonstrates how to interpret the output of ColocBoost, specifically to get the summary of colocalization and focusing only on strong colocalization events.
+
+```{r setup}
+library(colocboost)
+```
+
+## 1. Summarize ColocBoost results
+
+### Causal variant structure
+The dataset features two causal variants with indices 194 and 589.
+
+- Causal variant 194 is associated with traits 1, 2, 3, and 4.
+- Causal variant 589 is associated with traits 2, 3, and 5.
+
+```{r run-colocboost}
+# Loading the Dataset
+data(Ind_5traits)
+# Run colocboost 
+res <- colocboost(X = Ind_5traits$X, Y = Ind_5traits$Y)
+cos_summary <- res$cos_summary
+names(cos_summary)
+```
+
+The `cos_summary` object contains the colocalization summary for all colocalization events, with each row representing a single colocalization event.
+The summary includes the following columns:
+
+
+- **focal_outcome**: The focal outcome being analyzed, or `FALSE` if no focal outcome exists.
+- **colocalized_outcomes**: Traits that are colocalized within the 95% colocalization confidence set (CoS).
+- **cos_id**: A unique identifier for each 95% colocalization confidence set (CoS).
+- **purity**: The minimum absolute correlation of variants within the 95% colocalization confidence set (CoS).
+- **top_variable**: The variable with the highest variant colocalization probability (VCP).
+- **top_variable_vcp**: The variant colocalization probability for the top variable.
+- **cos_npc**: The normalized probability of colocalization for the 95% confidence set, providing empirical evidence in favor of colocalization over a trait-specific configuration.
+- **min_npc_outcome**: The minimum normalized probability among colocalized traits.
+- **n_variables**: The number of variables in the 95% colocalization confidence set (CoS).
+- **colocalized_index**: The indices of colocalized variables.
+- **colocalized_variables**: A list of colocalized variables.
+- **colocalized_variables_vcp**: The variant colocalization probabilities for all colocalized variables.
+
+
+To obtain the summary of colocalization with a specific focus on traits of interest, 
+you can use the `get_cos_summary`, see the detailed usage of this function in [link](https://statfungen.github.io/colocboost/reference/get_cos_summary.html). 
+This function allows you to filter the colocalization summary based on a particular outcome of interest, 
+making it easier to interpret the results for specific traits. 
+For example, if you are interested in the colocalization events involving the traits `Y1` and `Y2`, you can use the following code:
+
+
+```{r summary-colocboost}
+# Get summary table of colocalization
+cos_interest_outcome <- get_cos_summary(res, interest_outcome = c("Y1", "Y2"))
+```
+
+
+
+## 2. Filter colocalization events by relative strength of evidence
+
+In `cos_summary`, for each 95% CoS, the `cos_npc` column provides a normalized probability of colocalization and
+`min_npc_outcome` column provides the minimum normalized probability among colocalized traits.
+Those two metrics are measured as an empirical evidence of colocalization both in CoS-level and in trait-level.
+To obtain the best minimal colocalization configuration can be defined by using both `cos_npc` and `npc_outcome`.
+See the detailed usage of this function in [link](https://statfungen.github.io/colocboost/reference/get_robust_colocalization.html).
+
+
+```{r run-strong-colocalization}
+filter_res <- get_robust_colocalization(res, cos_npc_cutoff = 0.5, npc_outcome_cutoff = 0.2)
+```
+
+- The output from `get_robust_colocalization` is the same as output from `colocboost`, which can be directly used in any post inference and visualization.
+- `npc=0.5` or `npc_outcome = 0.2` maintains robust colocalization signals for cases when many traits are evaluated. 
+Higher thresholds can be specified if users want to focus only on strong colocalization events.
+
+
+## 3. More details on ColocBoost output
+
+The entire colocalization output from `colocboost` is stored in the `colocboost` object, which contains several components:
+
+- **`cos_summary`**: A summary table for colocalization events (see details in above Section 1).
+- **`vcp`**: The variable colocalized probability for each variable.
+- **`cos_details`**: A object with all information for colocalization results.
+- **`data_info`**: A object with the detailed information from input data.
+- **`model_info`**: A object with the detailed information for colocboost model.
+
+In this section, we will provide a detailed explanation of the components for deepening into ColocBoost result using a mixed dataset.
+
+```{r load-mixed-data}
+# Load example data
+data(Ind_5traits)
+data(Sumstat_5traits) 
+# Create a mixed dataset
+X <- Ind_5traits$X[1:4]
+Y <- Ind_5traits$Y[1:4]
+sumstat <- Sumstat_5traits$sumstat[5]
+LD <- get_cormat(Ind_5traits$X[[1]])
+# Run colocboost
+res <- colocboost(X = X, Y = Y, sumstat = sumstat, LD = LD)
+```
+
+### 3.1. Variant colocalization probability (**`vcp`**)
+
+- **`vcp`** is the probability of a variant being colocalized with at least one traits, serving as analogs of posterior inclusion probabilities (PIPs) in single-trait fine-mapping.
+To plot the VCP for the variants within at least one CoS, you can use the `colocboost_plot` function with the `y` argument set to `"vcp"`. 
+
+
+```{r vcp-plot}
+colocboost_plot(res, y = "vcp")
+```
+
+Please visit our documentation portal 
+at [Visualization of ColocBoost Results](https://statfungen.github.io/colocboost/articles/Visualization_ColocBoost_Output.html) for more details on the `colocboost_plot` function
+
+### 3.2. Analyzed data information (**`data_info`**)
+
+- **`n_variables`**: number of variants being included.
+- **`variables`**: vector of variant names across all traits being included in colocalization analysis.
+- **`coef`**: regression coefficients estimated from the colocboost model for each trait.
+- **`z`**: z-scores from marginal associations for each trait.
+- **`n_outcomes`**: the number of traits being included in colocalization analysis.
+- **`outcome_info`** contains information of analyzed data, including sample size and data type.
+
+```{r analyzed-data-info}
+res$data_info$outcome_info
+```
+
+
+### 3.3. Colocalization details (**`cos_details`**)
+
+**`cos_details`** provides a detailed information for colocalization events identified by `colocboost`. 
+This section will provide a detailed explanation of the components in `cos_details`.
+
+```{r cos-details}
+names(res$cos_details)
+```
+
+
+#### 3.3.1. Colocalized variants for each CoS (**`cos`**)
+
+- **`cos`**: A list with a detailed information of colocalized variants for each CoS. 
+  - **`cos_index`**: Indices of colocalized variables with unique identifier for each CoS.
+  - **`cos_variables`**: Names of colocalized variables with unique identifier for each CoS.
+- Note that variants are ordered by their VCP in descending order.
+
+```{r cos}
+res$cos_details$cos
+```
+
+#### 3.3.2. Colocalized traits for each 95% CoS (**`cos_outcomes`**)
+
+- **`cos_outcomes`**: A list with a detailed information of colocalized traits for each CoS. 
+  - **`outcome_index`**: Indices of colocalized traits with unique identifier for each CoS.
+  - **`outcome_name`**: Names of colocalized traits with unique identifier for each CoS.
+
+```{r cos-outcome}
+res$cos_details$cos_outcomes
+```
+
+- **`cos_npc`**: normalized probability of colocalization for CoS, providing empirical evidence in favor of colocalization over a trait-specific configuration.
+- **`cos_outcomes_npc`**: normalized probability for each colocalized trait in order with evidence strength.
+- These two metrics could be used to filter the colocalization events by relative strength of evidence, see details in Section 2.
+
+
+```{r cos-npc}
+res$cos_details$cos_npc
+res$cos_details$cos_outcomes_npc
+```
+
+
+- **`cos_purity`**: includes three lists, for each list, it contains $S \times S$ matrix, where $S$ is the number of CoS. 
+  - `min_abs_cor`: the minimum absolute correlation of variants within (diagonal) CoS or in-between (off-diagonal) different CoS.
+  - `median_abs_cor`: the median absolute correlation of variants within (diagonal) CoS or in-between (off-diagonal) different CoS.
+  - `max_abs_cor`: the maximum absolute correlation of variants within (diagonal) CoS or in-between (off-diagonal) different CoS.
+
+```{r cos-purity}
+res$cos_details$cos_purity
+```
+
+
+- **`cos_top_variables`**: indices and names of the top variant for each CoS, which is the variant with the highest VCP.
+- Note that there may exist multiple variants in perfect LD with the same highest VCP.
+
+```{r cos-top}
+res$cos_details$cos_top_variables
+```
+
+- **`cos_weights`**: the integrative weights for each colocalized trait in the CoS. This is used to recalibrate CoS when some traits are filtered out..
+- **`cos_vcp`**: the single-effect VCP for each CoS.
+
+
+### 3.4. Model information (**`model_info`**)
+
+- **`model_coveraged`**: if the model is converged.
+- **`outcome_model_coveraged`**: if the trait-specific model is converged.
+- **`n_updates`**: number of boosting rounds
+- **`outcome_n_updates`**: number of boosting rounds for each trait.
+- **`jk_update`**: indices of the variants being updated in the model at each boosting round. 
+
+```{r jk_update}
+# Pick arbitrary SEC updates, see entire update in advance
+res$model_info$jk_star[c(5:10,36:38), ]
+```
+
+- **`profile_loglik`**: joint profile log-likelihood changes over boosting rounds.
+- **`outcome_profile_loglik`**: trait-specific profile log-likelihood changes over boosting rounds.
+
+```{r profile_loglik}
+# Plotting joint profile log-likelihood (blue) and trait-specific profile log-likelihood (red).
+par(mfrow=c(2,3),mar=c(4,4,2,1))
+plot(res$model_info$profile_loglik, type="p", col="#3366CC", lwd=2, xlab="", ylab="Joint Profile")
+for(i in 1:5){
+plot(res$model_info$outcome_profile_loglik[[i]], type="p", col="#CC3333", lwd=2, xlab="", ylab=paste0("Profile (Trait ", i, ")"))
+}
+```
+
+- **`outcome_proximity_obj`**: trait-specific proximity smoothed objective for each trait.
+- **`outcome_coupled_best_update_obj`**: objective at the (coupled) best update variant for each outcome.
+
+
+```{r objective-proximity}
+# Save to restore default options
+oldpar <- par(no.readonly = TRUE)
+# Plotting trait-specific proximity objective
+par(mfrow=c(2,3), mar=c(4,4,2,1))
+for(i in 1:5){
+plot(res$model_info$outcome_proximity_obj[[i]], type="p", col="#3366CC", lwd=2, xlab="", ylab="Trait-specific Objective", main = paste0("Trait ", i))
+}
+par(oldpar)
+```
+
+```{r objective-best}
+# Save to restore default options
+oldpar <- par(no.readonly = TRUE)
+# Plotting trait-specific objective at the best update variant
+par(mfrow=c(2,3), mar=c(4,4,2,1))
+for(i in 1:5){ 
+  plot(res$model_info$outcome_coupled_best_update_obj[[i]], type="p", col="#CC3333", lwd=2, xlab="", ylab=paste0("Objective at best update variant"), main = paste0("Trait ", i)) 
+}
+par(oldpar)
+```
+
+### 3.5. Trait-specific effects information (**`ucos_details`**)
+
+There is `ucos_details` in ColocBoost output when setting `output_level = 2`, including the trait-specific (uncolocalized) information from the single-effect learner (SEL).
+
+```{r ucos-details}
+# Create a mixed dataset
+data(Ind_5traits)
+data(Heterogeneous_Effect)
+X <- Ind_5traits$X[1:3]
+Y <- Ind_5traits$Y[1:3]
+X1 <- Heterogeneous_Effect$X
+Y1 <- Heterogeneous_Effect$Y[,1,drop=F]
+res <- colocboost(X = c(X, list(X1)), Y = c(Y, list(Y1)), output_level = 2)
+names(res$ucos_details)
+```
+
+#### 3.5.1. Trait-specific (uncolocalized) confidence sets (**`ucos`**)
+
+- **`ucos`**: A list containing a detailed information about trait-specific (uncolocalized) variants for each uCoS.
+  - **`ucos_index`**: Indices of trait-specific (uncolocalized) variants.
+  - **`ucos_variables`**: Names of trait-specific (uncolocalized) variants.
+
+```{r ucos}
+res$ucos_details$ucos
+```
+
+#### 3.5.2. Trait-specific (uncolocalized) outcomes (**`ucos_outcomes`**)
+
+- **`ucos_outcomes`**: A list with a detailed information about trait-specific (uncolocalized) outcomes for each uCoS.
+  - **`outcome_index`**: Indices of trait-specific (uncolocalized) outcomes.
+  - **`outcome_name`**: Names of trait-specific (uncolocalized) outcomes.
+
+```{r ucos-outcomes}
+res$ucos_details$ucos_outcomes
+```
+
+#### 3.5.3. Purity across CoS and uCoS (**`cos_ucos_purity`**)
+
+- **`cos_ucos_purity`**: Includes three lists, each containing an $S \times uS$ matrix, where $S$ is the number of CoS and $uS$ is the number of uCoS:
+  - `min_abs_cor`: Minimum absolute correlation of variables across each pair of CoS and uCoS.
+  - `median_abs_cor`: Median absolute correlation of variables across each pair of CoS and uCoS.
+  - `max_abs_cor`: Maximum absolute correlation of variables across each pair of CoS and uCoS.
+
+```{r cos-ucos-purity}
+res$ucos_details$cos_ucos_purity
+```
+
+
+#### 3.5.4. Other components
+
+- **`ucos_weight`**: Integrative weights for each trait-specific (uncolocalized) trait, used to recalibrate uCoS when traits are filtered out.
+- **`ucos_top_variables`**: Indices and names of the top variable for each uCoS, which is the variable with the highest VCP.
+- **`ucos_purity`**: Includes three lists, each containing an $uS \times uS$ matrix, where $uS$ is the number of uCoS:
+  - `min_abs_cor`: Minimum absolute correlation of variables within (diagonal) uCoS or between (off-diagonal) different uCoS.
+  - `median_abs_cor`: Median absolute correlation of variables within or between uCoS.
+  - `max_abs_cor`: Maximum absolute correlation of variables within or between uCoS.
+
+By analyzing these components, you can gain a deeper understanding of trait-specific (uncolocalized) effects that are not colocalized, 
+providing additional insights into the data.
+
+
+### 3.6. Diagnostic details (**`diagnostic_details`**)
+
+There is `diagnostic_details` in ColocBoost output when setting `output_level = 3`:
+
+```{r diagnostic-details}
+# Loading the dataset
+data(Ind_5traits)
+X <- Ind_5traits$X
+Y <- Ind_5traits$Y
+res <- colocboost(X = X, Y = Y, output_level = 3)
+```
+
+- **`cb_model`**: trait-specific proximity gradient boosting model, including proximity weight at each iteration, residual after gradient boosting, etc.
+- **`weights_paths`**: individual trait-specific weights for each iteration.
+
+```{r cb-model}
+names(res$diagnostic_details$cb_model)
+names(res$diagnostic_details$cb_model$ind_outcome_1)
+```
+
+
+- **`cb_model_para`**: parameters used in fitting ColocBoost model.
+
+
+```{r cb-model-para}
+names(res$diagnostic_details$cb_model_para)
+```

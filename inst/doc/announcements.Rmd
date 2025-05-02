@@ -1,0 +1,17 @@
+---
+title: "News"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{News}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+
+---
+
+## ColocBoost on the media
+
+- *April 20, 2025*: Manuscript describing ColocBoost methods with applications is posted on [medRxiv](https://www.medrxiv.org/content/10.1101/2025.04.17.25326042v1).
+
+## Software updates
+
+- `v1.0.0` Initial public release. Pre-release versions `0.1.*` for reproducing our earlier work, including the first version of manuscript on medRxiv, are still available on [GitHub](https://github.com/StatFunGen/colocboost/tags).

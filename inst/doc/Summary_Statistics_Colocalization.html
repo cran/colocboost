@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Summary Statistics Data Colocalization</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Summary Statistics Data Colocalization</h1>
+
+
+
+<p>This vignette demonstrates how to perform multi-trait colocalization
+analysis using summary statistics data, specifically focusing on the
+<code>Sumstat_5traits</code> dataset included in the package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(colocboost)</span></code></pre></div>
+<div id="the-sumstat_5traits-dataset" class="section level1">
+<h1>1. The <code>Sumstat_5traits</code> Dataset</h1>
+<p>The <code>Sumstat_5traits</code> dataset contains 5 simulated summary
+statistics, where it is directly derived from the
+<code>Ind_5traits</code> dataset using marginal association. The dataset
+is specifically designed to evaluate and demonstrate the capabilities of
+ColocBoost in multi-trait colocalization analysis with summary
+association data.</p>
+<ul>
+<li><code>sumstat</code>: A list of data.frames of summary statistics
+for different traits.</li>
+<li><code>true_effect_variants</code>: True effect variants indices for
+each trait.</li>
+<li>Note that <code>LD</code> could be calculated from the
+<code>X</code> data in the <code>Ind_5traits</code> dataset, but it is
+not included in the <code>Sumstat_5traits</code> dataset.</li>
+</ul>
+<div id="causal-variant-structure" class="section level3">
+<h3>Causal variant structure</h3>
+<p>The dataset features two causal variants with indices 194 and
+589.</p>
+<ul>
+<li>Causal variant 194 is associated with traits 1, 2, 3, and 4.</li>
+<li>Causal variant 589 is associated with traits 2, 3, and 5.</li>
+</ul>
+<p>This structure creates a realistic scenario in which multiple traits
+are influenced by different but overlapping sets of genetic
+variants.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Loading the Dataset</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Sumstat_5traits&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">names</span>(Sumstat_5traits)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;sumstat&quot;              &quot;true_effect_variants&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>Sumstat_5traits<span class="sc">$</span>true_effect_variants</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; $Outcome_1</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; [1] 194</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; $Outcome_2</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [1] 194 589</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; $Outcome_3</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; [1] 194 589</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; $Outcome_4</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; [1] 194</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; $Outcome_5</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; [1] 589</span></span></code></pre></div>
+<p>Due to the file size limitation of CRAN release, this is a subset of
+simulated data. See full dataset in <a href="https://github.com/StatFunGen/colocboost-paper">colocboost paper
+repo</a>.</p>
+</div>
+<div id="important-data-format-for-summary-data" class="section level3">
+<h3>Important data format for summary data</h3>
+<p><code>sumstat</code> must include the following columns:</p>
+<ul>
+<li><code>z</code> or (<code>beta</code>, <code>sebeta</code>): either
+z-score or (effect size and standard error)</li>
+<li><code>n</code>: sample size for the summary statistics.
+<strong>Highly recommended</strong>: Providing the sample size, or even
+a rough estimate of <code>n</code>, is highly recommended. Without
+<code>n</code>, the implicit assumption is <code>n</code> is large (Inf)
+and the effect sizes are small (close to zero).</li>
+<li><code>variant</code>: required if <code>sumstat</code> for different
+outcomes do not have the same number of variables (multiple
+<code>sumstat</code> and multiple <code>LD</code>).</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">class</span>(Sumstat_5traits<span class="sc">$</span>sumstat[[<span class="dv">1</span>]])</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;data.frame&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">head</span>(Sumstat_5traits<span class="sc">$</span>sumstat[[<span class="dv">1</span>]])</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt;              z    n variant</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; 451 -1.0945531 1153    rs_1</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; 452 -0.4113347 1153    rs_2</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; 453 -0.4113347 1153    rs_3</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; 454 -0.7467923 1153    rs_4</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; 455 -0.3018575 1153    rs_5</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; 456 -0.5256479 1153    rs_6</span></span></code></pre></div>
+</div>
+</div>
+<div id="multiple-summary-statistics-data-with-shared-ld-reference" class="section level1">
+<h1>2. Multiple summary statistics data with shared LD reference</h1>
+<p>The preferred format for colocalization analysis in ColocBoost using
+summary statistics data is where one LD matrix is provided for all
+traits, and the summary statistics are organized in a list. The
+<strong>Basic format</strong> is</p>
+<ul>
+<li><code>sumstat</code> is organized as a list of data.frames for all
+traits</li>
+<li><code>LD</code> is a matrix of linkage disequilibrium (LD)
+information for all variants across all traits.</li>
+</ul>
+<p>This function requires specifying summary statistics
+<code>sumstat</code> and LD matrix <code>LD</code> from the dataset:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Extract genotype (X) and calculate LD matrix</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Ind_5traits&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>LD <span class="ot">&lt;-</span> <span class="fu">get_cormat</span>(Ind_5traits<span class="sc">$</span>X[[<span class="dv">1</span>]])</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co"># Run colocboost</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">colocboost</span>(<span class="at">sumstat =</span> Sumstat_5traits<span class="sc">$</span>sumstat, <span class="at">LD =</span> LD)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; Validating input data.</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; Starting gradient boosting algorithm.</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 4 converged after 40 iterations!</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 5 converged after 59 iterations!</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 1 converged after 61 iterations!</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 3 converged after 91 iterations!</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 2 converged after 94 iterations!</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co"># Identified CoS</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>res<span class="sc">$</span>cos_details<span class="sc">$</span>cos<span class="sc">$</span>cos_index</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; $`cos1:y1_y2_y3_y4`</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; [1] 186 194 168 205</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt; $`cos2:y2_y3_y5`</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt; [1] 589 593</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co"># Plotting the results</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="fu">colocboost_plot</span>(res)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div id="results-interpretation" class="section level3">
+<h3>Results Interpretation</h3>
+<p>For comprehensive tutorials on result interpretation and advanced
+visualization techniques, please visit our tutorials portal at <a href="https://statfungen.github.io/colocboost/articles/Visualization_ColocBoost_Output.html">Visualization
+of ColocBoost Results</a> and <a href="https://statfungen.github.io/colocboost/articles/Interpret_ColocBoost_Output.html">Interpret
+ColocBoost Output</a>.</p>
+</div>
+</div>
+<div id="other-summary-statistics-and-ld-input-combinations" class="section level1">
+<h1>3. Other summary statistics and LD input combinations</h1>
+<div id="matched-ld-with-multiple-sumstat-trait-specific-ld" class="section level2">
+<h2>3.1. Matched LD with multiple sumstat (Trait-specific LD)</h2>
+<p>When studying multiple traits with their own trait-specific LD
+matrices, you could provide a list of LD matrices matched with a list of
+summary statistics.</p>
+<ul>
+<li><strong>Basic format</strong>: <code>sumstat</code> and
+<code>LD</code> are organized as lists, matched by trait index,
+<ul>
+<li><code>(sumstat[1], LD[1])</code> contains information for trait
+1,</li>
+<li><code>(sumstat[2], LD[2])</code> contains information for trait
+2,</li>
+<li>And so on for each trait under analysis.</li>
+</ul></li>
+<li><strong>Cross-trait flexibility</strong>:
+<ul>
+<li>There is no requirement for the same variants across different
+traits. This allows for the analysis of traits with available
+variants.</li>
+<li>This is particularly useful when you have a large dataset with many
+traits and want to focus on specific variants and trait-specific
+LD.</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Duplicate LD with matched summary statistics</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>LD_multiple <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(Sumstat_5traits<span class="sc">$</span>sumstat), <span class="cf">function</span>(i) LD )</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Run colocboost</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">colocboost</span>(<span class="at">sumstat =</span> Sumstat_5traits<span class="sc">$</span>sumstat, <span class="at">LD =</span> LD_multiple)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; Validating input data.</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; Starting gradient boosting algorithm.</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 4 converged after 40 iterations!</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 5 converged after 59 iterations!</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 1 converged after 61 iterations!</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 3 converged after 91 iterations!</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 2 converged after 94 iterations!</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co"># Identified CoS</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>res<span class="sc">$</span>cos_details<span class="sc">$</span>cos<span class="sc">$</span>cos_index</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; $`cos1:y1_y2_y3_y4`</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; [1] 186 194 168 205</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; $`cos2:y2_y3_y5`</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; [1] 589 593</span></span></code></pre></div>
+</div>
+<div id="ld-matrix-is-a-superset-of-variants-across-different-summary-statistics" class="section level2">
+<h2>3.2. LD matrix is a superset of variants across different summary
+statistics</h2>
+<p>When the LD matrix includes a superset of variants across different
+summary statistics, with <strong>Input Format</strong>:</p>
+<ul>
+<li><code>sumstat</code> is a list of data.frames for all traits</li>
+<li><code>LD</code> is a matrix of linkage disequilibrium (LD)
+information for all variants across all traits.</li>
+<li>The LD matrix should contain superset of variants presented in the
+summary statistics data frames.</li>
+<li>This is particularly useful when you have a large LD matrix from a
+reference panel and want to use it for multiple summary statistics
+datasets. It allows for efficient analysis without redundancy.</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Create sumstat with different number of variants - remove 100 variants in each sumstat</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>LD_superset <span class="ot">&lt;-</span> LD</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>sumstat <span class="ot">&lt;-</span> <span class="fu">lapply</span>(Sumstat_5traits<span class="sc">$</span>sumstat, <span class="cf">function</span>(x) x[<span class="sc">-</span><span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(x), <span class="dv">20</span>), , <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co"># Run colocboost</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">colocboost</span>(<span class="at">sumstat =</span> sumstat, <span class="at">LD =</span> LD_superset)</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; Validating input data.</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; Starting gradient boosting algorithm.</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 4 converged after 41 iterations!</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 5 converged after 60 iterations!</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 1 converged after 62 iterations!</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 3 converged after 93 iterations!</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 2 converged after 95 iterations!</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co"># Identified CoS</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>res<span class="sc">$</span>cos_details<span class="sc">$</span>cos<span class="sc">$</span>cos_index</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; $`cos1:y1_y2_y3_y4`</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; [1] 186 194 168 205</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; $`cos2:y2_y3_y5`</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; [1] 589 593</span></span></code></pre></div>
+</div>
+<div id="arbitrary-ld-and-sumstat-with-dictionary-provided" class="section level2">
+<h2>3.3. Arbitrary LD and sumstat with dictionary provided</h2>
+<p>When studying multiple traits with arbitrary LD matrices for
+different summary statistics, we also provide the interface for
+arbitrary LD matrices with multiple sumstat. This particularly benefits
+meta-analysis across heterogeneous datasets where, for different subsets
+of summary statistics, LD comes from different populations.</p>
+<ul>
+<li><strong>Input Format</strong>:
+<ul>
+<li><code>sumstat = list(sumstat1, sumstat2, sumstat3, sumstat4, sumstat5)</code>
+is a list of data.frames for all traits.</li>
+<li><code>LD = list(LD1, LD2)</code> is a list of LD matrices.</li>
+<li><code>dict_sumstatLD</code> is a dictionary matrix that index of
+sumstat to index of LD.</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Create a simple dictionary for demonstration purposes</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>LD_arbitrary <span class="ot">&lt;-</span> <span class="fu">list</span>(LD, LD) <span class="co"># traits 1 and 2 matched to the first genotype matrix; traits 3,4,5 matched to the third genotype matrix.</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>dict_sumstatLD <span class="ot">=</span> <span class="fu">cbind</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co"># Display the dictionary</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>dict_sumstatLD</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2]</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; [1,]    1    1</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; [2,]    2    1</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; [3,]    3    2</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; [4,]    4    2</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; [5,]    5    2</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co"># Run colocboost</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">colocboost</span>(<span class="at">sumstat =</span> Sumstat_5traits<span class="sc">$</span>sumstat, <span class="at">LD =</span> LD_arbitrary, <span class="at">dict_sumstatLD =</span> dict_sumstatLD)</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; Validating input data.</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; Starting gradient boosting algorithm.</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 4 converged after 40 iterations!</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 5 converged after 59 iterations!</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 1 converged after 61 iterations!</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 3 converged after 91 iterations!</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 2 converged after 94 iterations!</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co"># Identified CoS</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>res<span class="sc">$</span>cos_details<span class="sc">$</span>cos<span class="sc">$</span>cos_index</span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; $`cos1:y1_y2_y3_y4`</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt; [1] 186 194 168 205</span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt; $`cos2:y2_y3_y5`</span></span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a><span class="co">#&gt; [1] 589 593</span></span></code></pre></div>
+</div>
+<div id="hyprcoloc-compatible-format-effect-size-and-standard-error-matrices" class="section level2">
+<h2>3.4. HyPrColoc compatible format: effect size and standard error
+matrices</h2>
+<p>ColocBoost also provides a flexibility to use HyPrColoc compatible
+format for summary statistics with and without LD matrix.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Loading the Dataset</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">data</span>(Ind_5traits)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>X <span class="ot">&lt;-</span> Ind_5traits<span class="sc">$</span>X</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>Y <span class="ot">&lt;-</span> Ind_5traits<span class="sc">$</span>Y</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co"># Coverting to HyPrColoc compatible format</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>effect_est <span class="ot">&lt;-</span> effect_se <span class="ot">&lt;-</span> effect_n <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(X)){</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  x <span class="ot">&lt;-</span> X[[i]]</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  y <span class="ot">&lt;-</span> Y[[i]]</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>  effect_n[i] <span class="ot">&lt;-</span> <span class="fu">length</span>(y)</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>  output <span class="ot">&lt;-</span> susieR<span class="sc">::</span><span class="fu">univariate_regression</span>(<span class="at">X =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>  effect_est <span class="ot">&lt;-</span> <span class="fu">cbind</span>(effect_est, output<span class="sc">$</span>beta)</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  effect_se <span class="ot">&lt;-</span> <span class="fu">cbind</span>(effect_se, output<span class="sc">$</span>sebeta)</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>}</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="fu">colnames</span>(effect_est) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(effect_se) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Y1&quot;</span>, <span class="st">&quot;Y2&quot;</span>, <span class="st">&quot;Y3&quot;</span>, <span class="st">&quot;Y4&quot;</span>, <span class="st">&quot;Y5&quot;</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="fu">rownames</span>(effect_est) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(effect_se) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(X[[<span class="dv">1</span>]])</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co"># Run colocboost</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>LD <span class="ot">&lt;-</span> <span class="fu">get_cormat</span>(Ind_5traits<span class="sc">$</span>X[[<span class="dv">1</span>]])</span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">colocboost</span>(<span class="at">effect_est =</span> effect_est, <span class="at">effect_se =</span> effect_se, <span class="at">effect_n =</span> effect_n, <span class="at">LD =</span> LD)</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="co">#&gt; Validating input data.</span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="co">#&gt; Starting gradient boosting algorithm.</span></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 4 converged after 40 iterations!</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 5 converged after 59 iterations!</span></span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 1 converged after 61 iterations!</span></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 3 converged after 91 iterations!</span></span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt; Gradient boosting for outcome 2 converged after 94 iterations!</span></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a></span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="co"># Identified CoS</span></span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a>res<span class="sc">$</span>cos_details<span class="sc">$</span>cos<span class="sc">$</span>cos_index</span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a><span class="co">#&gt; $`cos1:y1_y2_y3_y4`</span></span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a><span class="co">#&gt; [1] 186 194 168 205</span></span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a><span class="co">#&gt; $`cos2:y2_y3_y5`</span></span>
+<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a><span class="co">#&gt; [1] 589 593</span></span></code></pre></div>
+<p>See more details about data format to implement LD-free ColocBoost
+and LD-mismatch diagnosis in <a href="https://statfungen.github.io/colocboost/articles/LD_Free_Colocalization.html">LD
+mismatch and LD-free Colocalization</a>).</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
