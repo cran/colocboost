@@ -65,13 +65,13 @@ test_that("get_robust_colocalization filters results correctly", {
   cb_res <- generate_test_result()
   
   # Basic call
-  expect_error(get_robust_colocalization(cb_res), NA)
+  expect_error(suppressWarnings(get_robust_colocalization(cb_res)), NA)
   
   # With stricter thresholds
-  expect_error(get_robust_colocalization(cb_res, cos_npc_cutoff = 0.8), NA)
+  expect_error(suppressWarnings(get_robust_colocalization(cb_res, cos_npc_cutoff = 0.8)), NA)
   
   # With p-value threshold
-  expect_error(get_robust_colocalization(cb_res, pvalue_cutoff = 0.05), NA)
+  expect_error(suppressWarnings(get_robust_colocalization(cb_res, pvalue_cutoff = 0.05)), NA)
 })
 
 # Test for get_hierarchical_clusters
@@ -191,7 +191,7 @@ test_that("get_hierarchical_clusters functions correctly", {
 test_that("get_ambiguous_colocalization identifies ambiguous colocalizations correctly", {
   # The function expects a specialized test dataset that has ambiguous colocalizations
   # There's a reference in the example to a dataset named "Ambiguous_Colocalization"
-  data(Ambiguous_Colocalization)
+  data("Ambiguous_Colocalization", package = "colocboost", envir = environment())
   test_colocboost_results <- Ambiguous_Colocalization$ColocBoost_Results
   
   # Basic call with default parameters
@@ -256,7 +256,7 @@ test_that("get_ambiguous_colocalization identifies ambiguous colocalizations cor
 test_that("get_ucos_summary funtionality", {
   # The function expects a specialized test dataset that has ambiguous colocalizations
   # There's a reference in the example to a dataset named "Ambiguous_Colocalization"
-  data(Ambiguous_Colocalization)
+  data("Ambiguous_Colocalization", package = "colocboost", envir = environment())
   test_colocboost_results <- Ambiguous_Colocalization$ColocBoost_Results
   
   # Basic call with default parameters
