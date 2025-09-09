@@ -2,7 +2,7 @@ Package: colocboost
 Type: Package
 Date: 2025-09-08
 Title: Multi-Context Colocalization Analysis for QTL and GWAS Studies
-Version: 1.0.5
+Version: 1.0.6
 Authors@R: c(
   person(given = "Xuewei", family = "Cao", email = "xc2270@cumc.columbia.edu", role = c("cre", "aut", "cph")),
   person(given = "Haochen", family = "Sun", email = "hs3393@cumc.columbia.edu", role = c("aut", "cph")),
@@ -30,7 +30,7 @@ VignetteBuilder: knitr
 Config/testthat/edition: 3
 License: MIT + file LICENSE
 NeedsCompilation: no
-Packaged: 2025-09-08 18:41:22 UTC; xueweic
+Packaged: 2025-09-09 14:58:40 UTC; xueweic
 Author: Xuewei Cao [cre, aut, cph],
   Haochen Sun [aut, cph],
   Ru Feng [aut, cph],
@@ -38,4 +38,4 @@ Author: Xuewei Cao [cre, aut, cph],
   Kushal Dey [aut, cph],
   Gao Wang [aut, cph]
 Repository: CRAN
-Date/Publication: 2025-09-08 21:20:07 UTC
+Date/Publication: 2025-09-09 23:20:02 UTC
