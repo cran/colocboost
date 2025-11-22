@@ -425,9 +425,11 @@ algorithm takes longer to converge.</p>
 <span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; : Warning message: potential sumstat &amp; LD mismatch may happens for outcome 2 .</span></span>
 <span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; Using logLR = CoS(profile) - max(profile). Please check our website</span></span>
 <span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; https://statfungen.github.io/colocboost/articles/.</span></span>
-<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>res<span class="sc">$</span>cos_details<span class="sc">$</span>cos<span class="sc">$</span>cos_index</span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; $`cos1:y1_y2_y3_y4`</span></span>
-<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; [1] 229 186 194 205 168</span></span></code></pre></div>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; Extracting colocalization results with pvalue_cutoff = 0.001, cos_npc_cutoff = 0.2, and npc_outcome_cutoff = 0.2.</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; Keep only CoS with cos_npc &gt;= 0.2. For each CoS, keep the outcomes configurations that pvalue of variants for the outcome &lt; 0.001 and npc_outcome &gt;0.2.</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>res<span class="sc">$</span>cos_details<span class="sc">$</span>cos<span class="sc">$</span>cos_index</span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; $`cos1:y1_y3_y4`</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; [1] 186 205 194 168 218 228 229</span></span></code></pre></div>
 <p>These warnings serve as diagnostic tools to alert users about
 potential inconsistencies in the input data.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>res<span class="sc">$</span>cos_details<span class="sc">$</span>cos_outcomes_npc</span>
@@ -493,7 +495,9 @@ but still provides valuable insights into variant correlations.</p>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; Validating input data.</span></span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; Starting gradient boosting algorithm.</span></span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; Running ColocBoost with assumption of one causal per outcome per region!</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span></code></pre></div>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; Extracting colocalization results with pvalue_cutoff = 0.001, cos_npc_cutoff = 0.2, and npc_outcome_cutoff = 0.2.</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; Keep only CoS with cos_npc &gt;= 0.2. For each CoS, keep the outcomes configurations that pvalue of variants for the outcome &lt; 0.001 and npc_outcome &gt;0.2.</span></span></code></pre></div>
 <ul>
 <li><strong>LD-free</strong>: when the mismatch between the LD matrix
 and summary statistics is too large to be useful or when LD information
@@ -501,13 +505,15 @@ is completely unavailable, ColocBoost provides an LD-free approach.</li>
 </ul>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>res_free <span class="ot">&lt;-</span> <span class="fu">colocboost</span>(<span class="at">sumstat =</span> sumstat)</span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; Validating input data.</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; Warning in colocboost(sumstat = sumstat): Providing the LD for summary</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; statistics data is highly recommended. Without LD, only a single iteration will</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; be performed under the assumption of one causal variable per outcome.</span></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; Additionally, the purity of CoS cannot be evaluated!</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; Warning in colocboost_validate_input_data(X = X, Y = Y, sumstat = sumstat, :</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; Providing the LD for summary statistics data is highly recommended. Without LD,</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; only a single iteration will be performed under the assumption of one causal</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; variable per outcome. Additionally, the purity of CoS cannot be evaluated!</span></span>
 <span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; Starting gradient boosting algorithm.</span></span>
 <span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; Running ColocBoost with assumption of one causal per outcome per region!</span></span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span></code></pre></div>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; Extracting colocalization results with pvalue_cutoff = 0.001, cos_npc_cutoff = 0.2, and npc_outcome_cutoff = 0.2.</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; Keep only CoS with cos_npc &gt;= 0.2. For each CoS, keep the outcomes configurations that pvalue of variants for the outcome &lt; 0.001 and npc_outcome &gt;0.2.</span></span></code></pre></div>
 <p>While this method is computationally efficient, it has limitations
 due to the strong assumption of a single causal variant per trait per
 region. Users should interpret the results with caution, especially in
@@ -536,19 +542,20 @@ format for summary statistics without LD matrix.</p>
 <span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co"># Run colocboost</span></span>
 <span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">colocboost</span>(<span class="at">effect_est =</span> effect_est, <span class="at">effect_se =</span> effect_se, <span class="at">effect_n =</span> effect_n)</span>
 <span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt; Validating input data.</span></span>
-<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; Warning in colocboost(effect_est = effect_est, effect_se = effect_se, effect_n</span></span>
-<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; = effect_n): Providing the LD for summary statistics data is highly</span></span>
-<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt; recommended. Without LD, only a single iteration will be performed under the</span></span>
-<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt; assumption of one causal variable per outcome. Additionally, the purity of CoS</span></span>
-<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; cannot be evaluated!</span></span>
-<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt; Starting gradient boosting algorithm.</span></span>
-<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; Running ColocBoost with assumption of one causal per outcome per region!</span></span>
-<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span>
-<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a></span>
-<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a><span class="co"># Identified CoS</span></span>
-<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a>res<span class="sc">$</span>cos_details<span class="sc">$</span>cos<span class="sc">$</span>cos_index</span>
-<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a><span class="co">#&gt; $`cos1:y1_y3_y4`</span></span>
-<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co">#&gt; [1] 186 205 194 168</span></span></code></pre></div>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; Warning in colocboost_validate_input_data(X = X, Y = Y, sumstat = sumstat, :</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; Providing the LD for summary statistics data is highly recommended. Without LD,</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt; only a single iteration will be performed under the assumption of one causal</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt; variable per outcome. Additionally, the purity of CoS cannot be evaluated!</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; Starting gradient boosting algorithm.</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt; Running ColocBoost with assumption of one causal per outcome per region!</span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; Performing inference on colocalization events.</span></span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt; Extracting colocalization results with pvalue_cutoff = 0.001, cos_npc_cutoff = 0.2, and npc_outcome_cutoff = 0.2.</span></span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a><span class="co">#&gt; Keep only CoS with cos_npc &gt;= 0.2. For each CoS, keep the outcomes configurations that pvalue of variants for the outcome &lt; 0.001 and npc_outcome &gt;0.2.</span></span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="co"># Identified CoS</span></span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a>res<span class="sc">$</span>cos_details<span class="sc">$</span>cos<span class="sc">$</span>cos_index</span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co">#&gt; $`cos1:y1_y3_y4`</span></span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co">#&gt; [1] 186 205 194 168</span></span></code></pre></div>
 </div>
 
 

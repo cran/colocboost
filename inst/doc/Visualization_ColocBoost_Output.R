@@ -2,7 +2,7 @@
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  dpi = 80
+  dpi = 70
 )
 
 ## ----setup--------------------------------------------------------------------
@@ -18,7 +18,7 @@ res <- colocboost(X = Ind_5traits$X, Y = Ind_5traits$Y)
 colocboost_plot(res)
 
 ## ----zoomin-plot--------------------------------------------------------------
-colocboost_plot(res, grange = c(1:400))
+colocboost_plot(res, grange = c(1:400), outcome_idx = c(1:4))
 
 ## ----top-plot-----------------------------------------------------------------
 colocboost_plot(res, show_top_variables = TRUE)
@@ -29,8 +29,9 @@ colocboost_plot(res, show_cos_to_uncoloc = TRUE)
 ## ----vertical-plot------------------------------------------------------------
 colocboost_plot(
   res, show_top_variables = TRUE, 
-  add_vertical = TRUE, 
-  add_vertical_idx = unique(unlist(Ind_5traits$true_effect_variants))
+  add_highlight = TRUE, 
+  add_highlight_idx = unique(unlist(Ind_5traits$true_effect_variants)),
+  add_highlight_style = "star"
 )
 
 ## ----trait-specific-----------------------------------------------------------

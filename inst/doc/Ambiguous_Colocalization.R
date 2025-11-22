@@ -2,7 +2,7 @@
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  dpi = 80
+  dpi = 70
 )
 
 ## ----setup--------------------------------------------------------------------

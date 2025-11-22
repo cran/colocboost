@@ -342,7 +342,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <p>This vignette demonstrates how to use the bioinformatics pipeline for
 ColocBoost to perform colocalization analysis with
-<code>colocboost</code>.</p>
+<code>colocboost</code> for multiple individual-level datasets and/or
+summary statistics datasets.</p>
 <ul>
 <li>See more details about functions in the package <code>pecotmr</code>
 with <a href="https://github.com/StatFunGen/pecotmr/tree/main">link</a>
@@ -350,166 +351,375 @@ and <code>colocboost_pipeline</code> with <a href="https://github.com/StatFunGen
 <li>See more details about input data preparation in
 <code>xqtl_protocol</code> with <a href="https://statfungen.github.io/xqtl-protocol/code/mnm_analysis/mnm_methods/colocboost.html">link</a>.</li>
 </ul>
+<p>Acknowledgment: Thanks to Kate (Kathryn) Lawrence (GitHub:<span class="citation">@kal26</span>) for her contributions to this
+vignette.</p>
 <div id="loading-data-using-colocboost_analysis_pipeline-function" class="section level1">
 <h1>1. Loading Data using <code>colocboost_analysis_pipeline</code>
 function</h1>
 <p>This function harmonizes the input data and prepares it for
-colocalization analysis. In this section, we introduce how to load the
-regional data required for the ColocBoost analysis using the
+colocalization analysis.</p>
+<p>In this section, we introduce how to load the regional data required
+for the ColocBoost analysis using the
 <code>load_multitask_regional_data</code> function. This function loads
 mixed datasets for a specific region, including individual-level data
-(genotype, phenotype, covariate data) or summary statistics (sumstats,
-LD). Run <code>load_regional_univariate_data</code> and
-<code>load_rss_data</code> multiple times for different datasets.</p>
-<p>Below are the input parameters for this function:</p>
+(genotype, phenotype, covariate data), summary statistics (sumstats,
+LD), or a combination of both. It runs
+<code>load_regional_univariate_data</code> for each individual-level
+dataset and <code>load_rss_data</code> for each summary statistics
+dataset. The output is a list with <code>individual_data</code> and
+<code>sumstat_data</code> components, where <code>individual_data</code>
+is a list of individual-level data and <code>sumstat_data</code> is a
+list of summary statistics data. This list is then passed to the
+<code>colocboost_analysis_pipeline</code> function for the
+colocalization analysis.</p>
+<p>Below are the input parameters for this function for loading
+individual-level data:</p>
 <div id="loading-individual-level-data-from-multiple-cohorts" class="section level2">
 <h2>1.1. Loading individual-level data from multiple cohorts</h2>
+<p>Inputs:</p>
 <ul>
-<li><strong><code>region</code></strong> (required): A string of
-<code>chr:start-end</code> for the phenotype region you want to
-analyze.</li>
-<li><strong><code>genotype_list</code></strong>: A vector of paths for
-PLINK bed files containing genotype data.</li>
-<li><strong><code>phenotype_list</code></strong>: A vector of paths for
-phenotype file names.</li>
-<li><strong><code>covariate_list</code></strong>: A vector of paths for
-covariate file names corresponding to the phenotype file vector.</li>
-<li><strong><code>conditions_list_individual</code></strong>: A vector
-of strings representing different conditions or groups.</li>
-<li><strong><code>match_geno_pheno</code></strong>: A vector of indices
-of phenotypes matched to genotype if multiple genotype PLINK files are
-used.</li>
-<li><strong><code>maf_cutoff</code></strong>: Minimum minor allele
-frequency (MAF) cutoff. Default is 0.</li>
-<li><strong><code>mac_cutoff</code></strong>: Minimum minor allele count
-(MAC) cutoff. Default is 0.</li>
-<li><strong><code>xvar_cutoff</code></strong>: Minimum variance cutoff.
-Default is 0.</li>
-<li><strong><code>imiss_cutoff</code></strong>: Maximum individual
-missingness cutoff. Default is 0.</li>
-<li><strong><code>association_window</code></strong>: A string of
-<code>chr:start-end</code> for the association analysis window (cis or
-trans). If not provided, all genotype data will be loaded.</li>
-<li><strong><code>extract_region_name</code></strong>: A list of vectors
-of strings (e.g., gene ID <code>ENSG00000269699</code>) to subset the
-information when there are multiple regions available. Default is
-<code>NULL</code>.</li>
-<li><strong><code>region_name_col</code></strong>: Column name
-containing the region name. Default is <code>NULL</code>.</li>
-<li><strong><code>keep_indel</code></strong>: Logical indicating whether
-to keep insertions/deletions (INDELs). Default is
+<li><strong><code>region</code></strong>: String ; Genomic region of
+interest in the format of <code>chr:start-end</code> for the phenotype
+region you want to analyze.</li>
+<li><strong><code>genotype_list</code></strong>: Character vector; Paths
+for PLINK bed files containing genotype data (do NOT include .bed
+suffix).</li>
+<li><strong><code>phenotype_list</code></strong>: Character vector;
+Paths for phenotype file names.</li>
+<li><strong><code>covariate_list</code></strong>: Character vector;
+Paths for covariate file names for each phenotype. Must have the same
+length as the phenotype file vector.</li>
+<li><strong><code>conditions_list_individual</code></strong>: Character
+vector; Strings representing different conditions or groups used for
+naming. Must have the same length as the phenotype file vector.</li>
+<li><strong><code>match_geno_pheno</code></strong>: Integer vector;
+Indices of phenotypes matched to genotype if multiple genotype PLINK
+files are used. For each phenotype file in <code>phenotype_list</code>,
+the index of the genotype file in <code>genotype_list</code> it matches
+with.</li>
+<li><strong><code>association_window</code></strong>: String; Genomic
+region of interest in the format of <code>chr:start-end</code> for the
+association analysis window of variants to test (cis or trans). If not
+provided, all genotype data will be loaded.</li>
+<li><strong><code>extract_region_name</code></strong>: List of character
+vectors; Phenotype names (e.g., gene ID <code>ENSG00000269699</code>) to
+subset the phenotype data when there are multiple phenotypes available
+in the region. Must have the same length as the phenotype file vector.
+Default is <code>NULL</code>, which will use all phenotypes in the
+region.</li>
+<li><strong><code>region_name_col</code></strong>: Integer; 1-based
+index of the column containing the region name (i.e. 4 for gene ID in a
+bed file). Required if <code>extract_region_name</code> is not
+<code>NULL</code>, or if multiple phenotypes fall into the same region
+in one phenotype file</li>
+<li><strong><code>keep_indel</code></strong>: Logical; indicating
+whether to keep insertions/deletions (INDELs). Default is
 <code>TRUE</code>.</li>
-<li><strong><code>keep_samples</code></strong>: A vector of sample names
-to keep. Default is <code>NULL</code>.</li>
+<li><strong><code>keep_samples</code></strong>: Character vector; Sample
+names to keep. Default is <code>NULL</code>. Currently only supports
+keeping the same samples from all genotype and phenotype files.</li>
+<li><strong><code>maf_cutoff</code></strong>: Numeric; Minimum minor
+allele frequency (MAF) cutoff. Default is 0.</li>
+<li><strong><code>mac_cutoff</code></strong>: Numeric; Minimum minor
+allele count (MAC) cutoff. Default is 0.</li>
+<li><strong><code>xvar_cutoff</code></strong>: Numeric; Minimum genotype
+variance cutoff. Default is 0.</li>
+<li><strong><code>imiss_cutoff</code></strong>: Numeric; Maximum
+individual missingness cutoff. Default is 0.</li>
 </ul>
-<p><strong>Illustrated example</strong></p>
+<p>Outputs:</p>
+<ul>
+<li><strong><code>region_data</code></strong>: List (with
+<code>individual_data</code>, <code>sumstat_data</code>); Output of the
+<code>load_multitask_regional_data</code> function. If only
+individual-level data is loaded, <code>sumstat_data</code> will be
+<code>NULL</code>.</li>
+</ul>
+<p><strong>Individual-level data loading example</strong></p>
 <p>The following example demonstrates how to set up input data with 3
-phenotypes and 2 cohorts, where the first cohort has 2 phenotypes and
-the second cohort has 1 phenotype.</p>
+phenotypes and 2 cohorts. The first cohort has 2 phenotypes and the
+second cohort has 1 phenotype. The first phenotype has 2 genes and the
+second phenotype has 1 gene.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># Example of loading individual-level data</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>region <span class="ot">=</span> <span class="st">&quot;chr1:1000000-2000000&quot;</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>genotype_list <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;plink_cohort1.1.bed&quot;</span>, <span class="st">&quot;plink_cohort1.2.bed&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>genotype_list <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;plink_cohort1.1&quot;</span>, <span class="st">&quot;plink_cohort1.2&quot;</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>phenotype_list <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;phenotype1_cohort1.bed.gz&quot;</span>, <span class="st">&quot;phenotype2_cohort1.bed.gz&quot;</span>, <span class="st">&quot;phenotype1_cohort2.bed.gz&quot;</span>)</span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>covariate_list <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;covariate1_cohort1.bed.gz&quot;</span>, <span class="st">&quot;covariate2_cohort1.bed.gz&quot;</span>, <span class="st">&quot;covariate1_cohort2.bed.gz&quot;</span>)</span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>conditions_list_individual <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;phenotype1_cohort1&quot;</span>, <span class="st">&quot;phenotype2_cohort1&quot;</span>, <span class="st">&quot;phenotype1_cohort2&quot;</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>match_geno_pheno <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>) <span class="co"># indices of phenotypes matched to genotype</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>association_window <span class="ot">=</span> <span class="st">&quot;chr1:1000000-2000000&quot;</span> <span class="co"># same as region for cis-analysis</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co"># Following parameters need to be set according to your data</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>maf_cutoff <span class="ot">=</span> <span class="fl">0.01</span></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>mac_cutoff <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>xvar_cutoff <span class="ot">=</span> <span class="dv">0</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>imiss_cutoff <span class="ot">=</span> <span class="fl">0.9</span></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co"># More advanced parameters see pecotmr::load_multitask_regional_data()</span></span></code></pre></div>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>match_geno_pheno <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>association_window <span class="ot">=</span> <span class="st">&quot;chr1:1000000-2000000&quot;</span> <span class="co"># set to be the same as region for cis-analysis</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>extract_region_name <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;ENSG00000269699, ENSG00000789633&quot;</span>), <span class="fu">c</span>(<span class="st">&quot;ENSG00000269699&quot;</span>), <span class="fu">c</span>(<span class="st">&quot;ENSG00000269699&quot;</span>, <span class="st">&quot;ENSG00000789633&quot;</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>region_name_col <span class="ot">=</span> <span class="dv">4</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>keep_indel <span class="ot">=</span> <span class="cn">TRUE</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>keep_samples <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;SAMPLE1&quot;</span>, <span class="st">&quot;SAMPLE2&quot;</span>, <span class="st">&quot;SAMPLE3&quot;</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co"># Following parameters need to be set according to your data</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>maf_cutoff <span class="ot">=</span> <span class="fl">0.01</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>mac_cutoff <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>xvar_cutoff <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>imiss_cutoff <span class="ot">=</span> <span class="fl">0.9</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co"># More advanced parameters see pecotmr::load_multitask_regional_data()</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>region_data_individual <span class="ot">&lt;-</span> <span class="fu">load_multitask_regional_data</span>(</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>    <span class="at">region =</span> region,</span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>    <span class="at">genotype_list =</span> genotype_list,</span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>    <span class="at">phenotype_list =</span> phenotype_list,</span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>    <span class="at">covariate_list =</span> covariate_list,</span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>    <span class="at">conditions_list_individual =</span> conditions_list_individual,</span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>    <span class="at">match_geno_pheno =</span> match_geno_pheno,</span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>    <span class="at">association_window =</span> association_window,</span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a>    <span class="at">region_name_col =</span> region_name_col,</span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a>    <span class="at">extract_region_name =</span> extract_region_name,</span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a>    <span class="at">keep_indel =</span> keep_indel,</span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a>    <span class="at">keep_samples =</span> keep_samples,</span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a>    <span class="at">maf_cutoff =</span> maf_cutoff,</span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a>    <span class="at">mac_cutoff =</span> mac_cutoff,</span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a>    <span class="at">xvar_cutoff =</span> xvar_cutoff,</span>
+<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a>    <span class="at">imiss_cutoff =</span> imiss_cutoff</span>
+<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="loading-summary-statistics-from-multiple-cohorts-or-datasets" class="section level2">
 <h2>1.2. Loading summary statistics from multiple cohorts or
 datasets</h2>
+<p>Inputs:</p>
 <ul>
-<li><strong><code>sumstat_path_list</code></strong>: A vector of file
-paths to the summary statistics.</li>
-<li><strong><code>column_file_path_list</code></strong>: A vector of
-file paths to the column mapping files.</li>
-<li><strong><code>LD_meta_file_path_list</code></strong>: A vector of
-paths to LD metadata files. LD metadata is a data frame specifying LD
-blocks with columns “chrom”, “start”, “end”, and “path”. “start” and
-“end” denote the positions of LD blocks, and “path” is the path of each
-LD block, optionally including <code>bim</code> file paths.</li>
-<li><strong><code>match_LD_sumstat</code></strong>: Logical indicating
-whether to match LD blocks with summary statistics.</li>
-<li><strong><code>conditions_list_sumstat</code></strong>: A vector of
-strings representing different sumstats.</li>
-<li><strong><code>n_samples</code></strong>: User-specified sample size.
-If unknown, set as 0 to retrieve from the sumstat file.</li>
-<li><strong><code>n_cases</code></strong>: User-specified number of
-cases.</li>
-<li><strong><code>n_controls</code></strong>: User-specified number of
-controls.</li>
-<li><strong><code>region</code></strong>: The region where tabix is used
-to subset the input dataset.</li>
-<li><strong><code>extract_sumstats_region_name</code></strong>:
-User-specified gene/phenotype name used to further subset the phenotype
-data.</li>
-<li><strong><code>sumstats_region_name_col</code></strong>: Filter this
-specific column for the <code>extract_sumstats_region_name</code>.</li>
-<li><strong><code>comment_string</code></strong>: Comment sign in the
-column mapping file, default is <code>#</code>.</li>
-<li><strong><code>extract_coordinates</code></strong>: Optional data
-frame with columns “chrom” and “pos” for specific coordinates
-extraction.</li>
+<li><strong><code>sumstat_path_list</code></strong>: Character vector;
+Paths to the summary statistics.</li>
+<li><strong><code>column_file_path_list</code></strong>: Character
+vector; Paths to the column mapping files. See below for expected
+format.</li>
+<li><strong><code>LD_meta_file_path_list</code></strong>: Character
+vector; Paths to LD metadata files. See below for expected format.</li>
+<li><strong><code>conditions_list_sumstat</code></strong>: Character
+vector; Strings representing different sumstats used for naming. Must
+have the same length as the sumstat file vector.</li>
+<li><strong><code>match_LD_sumstat</code></strong>: List of character
+vectors; Mapping each LD metadata file to the summary-statistics
+conditions to pair with it. Length must equal
+<code>LD_meta_file_path_list</code>. Each element is a character vector
+of names present in <code>conditions_list_sumstat</code>. If omitted or
+an element is empty, defaults to all conditions for the first LD.</li>
+<li><strong><code>association_window</code></strong>: String; Genomic
+region of interest in the format of <code>chr:start-end</code> for the
+association analysis window of variants to test (cis or trans). If not
+provided, all genotype data will be loaded.</li>
+<li><strong><code>n_samples</code></strong>: Integer vector; Sample
+size. Set a 0 if <code>n_cases</code>/<code>n_controls</code> are passed
+explicitly. If unknown, set as 0 and include <code>n_samples</code>
+column in the column mapping file to retrieve from the sumstat
+file.</li>
+<li><strong><code>n_cases</code></strong>: Integer vector; Number of
+cases. Set a 0 if <code>n_samples</code> is passed explicitly. If
+unknown, set as 0 and include <code>n_cases</code> column in the column
+mapping file to retrieve from the sumstat file.</li>
+<li><strong><code>n_controls</code></strong>: Integer vector; Number of
+controls. Set a 0 if <code>n_samples</code> is passed explicitly. If
+unknown, set as 0 and include <code>n_controls</code> column in the
+column mapping file to retrieve from the sumstat file.</li>
 </ul>
-<p><strong>Illustrated example</strong></p>
+<p>Outputs:</p>
+<ul>
+<li><strong><code>region_data</code></strong>: List (with
+<code>individual_data</code>, <code>sumstat_data</code>); Output of the
+<code>load_multitask_regional_data</code> function. If only summary
+statistics data is loaded, <code>individual_data</code> will be
+<code>NULL</code>.</li>
+</ul>
+<p><strong>Summary statistics loading example</strong></p>
 <p>The following example demonstrates how to set up input data with 2
 summary statistics and one LD reference.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Example of loading summary statistics</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>sumstat_path_list <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;sumstat1.tsv.gz&quot;</span>, <span class="st">&quot;sumstat2.tsv.gz&quot;</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>column_file_path_list <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;mapping_columns_1.yml&quot;</span>, <span class="st">&quot;mapping_columns_2.yml&quot;</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>LD_meta_file_path_list <span class="ot">=</span> <span class="st">&quot;ld_meta_file.tsv&quot;</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>covariate_list <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;covariate1_cohort1.bed.gz&quot;</span>, <span class="st">&quot;covariate2_cohort1.bed.gz&quot;</span>, <span class="st">&quot;covariate1_cohort2.bed.gz&quot;</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>conditions_list_sumstat <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;sumstat_1&quot;</span>, <span class="st">&quot;sumstat_2&quot;</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># Following parameters need to be set according to your data</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>n_samples <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>n_cases <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">10000</span>, <span class="dv">20000</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>n_controls <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">20000</span>, <span class="dv">40000</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co"># More advanced parameters see pecotmr::load_multitask_regional_data()</span></span></code></pre></div>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>column_file_path_list <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;column_mapping_sumstat1.yml&quot;</span>, <span class="st">&quot;column_mapping_sumstat2.yml&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>LD_meta_file_path_list <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;ld_meta_file.tsv&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>conditions_list_sumstat <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;sumstat_1&quot;</span>, <span class="st">&quot;sumstat_2&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>match_LD_sumstat <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;sumstat_1&quot;</span>, <span class="st">&quot;sumstat_2&quot;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>association_window <span class="ot">=</span> <span class="st">&quot;chr1:1000000-2000000&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co"># Following parameters need to be set according to your data</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>n_samples <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">300000</span>, <span class="dv">0</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>n_cases <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">20000</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>n_controls <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">40000</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co"># More advanced parameters see pecotmr::load_multitask_regional_data()</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>region_data_sumstat <span class="ot">&lt;-</span> <span class="fu">load_multitask_regional_data</span>(</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>    <span class="at">sumstat_path_list =</span> sumstat_path_list,</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>    <span class="at">column_file_path_list =</span> column_file_path_list,</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>    <span class="at">LD_meta_file_path_list =</span> LD_meta_file_path_list,</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>    <span class="at">conditions_list_sumstat =</span> conditions_list_sumstat,</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>    <span class="at">match_LD_sumstat =</span> match_LD_sumstat,</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>    <span class="at">association_window =</span> association_window,</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>    <span class="at">n_samples =</span> n_samples,</span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>    <span class="at">n_cases =</span> n_cases,</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>    <span class="at">n_controls =</span> n_controls</span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>)</span></code></pre></div>
+<p><strong>Expected format for column mapping file</strong></p>
+<p>The column mapping file is YAML (<code>.yml</code>) with key: value
+pairs mapping your input column names to the standardized names expected
+by the loader. Required columns are <code>chrom</code>,
+<code>pos</code>, <code>A1</code>, and <code>A2</code>, and either
+<code>z</code> or <code>beta</code> and <code>sebeta</code>. Either
+‘n_case’ and ‘n_control’ or ‘n_samples’ can be passed as part of the
+column mapping, but will be overwritten by the n_cases and n_controls or
+n_samples parameters passed explicitly.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># required</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">chrom</span><span class="kw">:</span><span class="at"> chromosome</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">pos</span><span class="kw">:</span><span class="at"> position</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">A1</span><span class="kw">:</span><span class="at"> effect_allele</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">A2</span><span class="kw">:</span><span class="at"> non_effect_allele</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">z</span><span class="kw">:</span><span class="at"> zscore </span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">beta</span><span class="kw">:</span><span class="at"> beta</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="fu">sebeta</span><span class="kw">:</span><span class="at"> sebeta</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co"># optional, will be overridden by n_samples or n_cases and n_controls if passed explicitly</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="fu">n_case</span><span class="kw">:</span><span class="at"> NCASE</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="fu">n_control</span><span class="kw">:</span><span class="at"> NCONTROL</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="fu">n_sample</span><span class="kw">:</span><span class="at"> </span><span class="ch">N</span></span></code></pre></div>
+<p><strong>Expected format for LD metadata file</strong> LD files should
+be in the format generated by for instance
+<code>plink --r squared</code>, then xz compressed. The LD metadata file
+is a tab-separated file with the following columns: -
+<code>chrom</code>: chromosome - <code>start</code>: start position -
+<code>end</code>: end position - <code>ld_path, bim_path</code>: path to
+the LD block file and bim file</p>
+<pre><code>1   1000000 2000000 ld_block_1.ld.gz,ld_block_1.bim</code></pre>
 </div>
 </div>
 <div id="perform-colocboost-using-colocboost_analysis_pipeline-function" class="section level1">
 <h1>2. Perform ColocBoost using
 <code>colocboost_analysis_pipeline</code> function</h1>
-<p>In this section, we perform the colocalization analysis using the
-<code>colocboost_analysis_pipeline</code> function. Below are the input
-parameters for this function:</p>
+<p>In this section, we load region data for a combination of
+individual-level and summary statistics data, then perform the
+colocalization analysis using the
+<code>colocboost_analysis_pipeline</code> function. The colocalization
+analysis can be run in any one of three modes, or in a combination of
+these modes (names assume that individual-level data is xQTL data and
+summary statistics data is GWAS data):</p>
 <ul>
-<li><strong><code>region_data</code></strong>: The output of the
-<code>load_multitask_regional_data</code> function.</li>
-<li><strong><code>focal_trait</code></strong>: Name of the trait if
-performing disease-prioritized ColocBoost.</li>
-<li><strong><code>event_filters</code></strong>: A list of patterns for
-filtering events based on context names. Example: for sQTL,
-<code>list(type_pattern = &quot;.*clu_(\\d+_[+-?]).*&quot;, valid_pattern = &quot;clu_(\\d+_[+-?]):PR:&quot;, exclude_pattern = &quot;clu_(\\d+_[+-?]):IN:&quot;)</code>.</li>
-<li><strong><code>maf_cutoff</code></strong>: A scalar to remove
-variants with maf &lt; maf_cutoff, default is 0.005.</li>
-<li><strong><code>pip_cutoff_to_skip_ind</code></strong>: A vector of
-cutoff values for skipping analysis based on PIP values for each
-context. Default is 0.</li>
-<li><strong><code>pip_cutoff_to_skip_sumstat</code></strong>: A vector
-of cutoff values for skipping analysis based on PIP values for each
-sumstat. Default is 0.</li>
-<li><strong><code>qc_method</code></strong>: Quality control method to
-use. Options are “rss_qc”, “dentist”, or “slalom” (default:
-“rss_qc”).</li>
-<li><strong><code>impute</code></strong>: Logical; if TRUE, performs
-imputation for outliers identified in the analysis (default: TRUE).</li>
-<li><strong><code>impute_opts</code></strong>: A list of imputation
-options including rcond, R2_threshold, and minimum_ld (default:
-<code>list(rcond = 0.01, R2_threshold = 0.6, minimum_ld = 5)</code>).</li>
+<li><strong><code>xQTL-only mode</code></strong>: Only perform
+colocalization analysis on the individual-level data. Summary statistics
+data is not used.</li>
+<li><strong><code>joint GWAS mode</code></strong>: Perform
+colocalization analysis in disease-agnostic mode on the individual-level
+and summary statistics data together.</li>
+<li><strong><code>separate GWAS mode</code></strong>: Perform
+colocalization analysis in disease-prioritized mode on the the
+individual-level data and each summary statistics dataset separately,
+treating each summary statistics dataset as the focal trait.</li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># region_data &lt;- load_multitask_regional_data(...)</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co"># res &lt;- colocboost_analysis_pipeline(region_data)</span></span></code></pre></div>
+<p>Inputs:</p>
+<ul>
+<li><strong><code>region_data</code></strong>: List (with
+<code>individual_data</code>, <code>sumstat_data</code>); Output of the
+<code>load_multitask_regional_data</code> function.</li>
+<li><strong><code>focal_trait</code></strong>: String; For xQTL-only
+mode, the name of the trait to perform disease-prioritized ColocBoost,
+from <code>conditions_list_individual</code>. If not provided, xQTL-only
+mode will be run without disease-prioritized mode.</li>
+<li><strong><code>event_filters</code></strong>: List of character
+vectors; Patterns for filtering events based on context names. Example:
+for sQTL,
+<code>list(type_pattern = &quot;.*clu_(\\d+_[+-?]).*&quot;, valid_pattern = &quot;clu_(\\d+_[+-?]):PR:&quot;, exclude_pattern = &quot;clu_(\\d+_[+-?]):IN:&quot;)</code>.</li>
+<li><strong><code>maf_cutoff</code></strong>: Numeric; Minor allele
+frequency cutoff. Default is 0.005.</li>
+<li><strong><code>pip_cutoff_to_skip_ind</code></strong>: Integer
+vector; Cutoff values for skipping analysis based on pre-screening with
+single-effect SuSiE (L=1). Context is skipped if none of the variants in
+the context have PIP values greater than the cutoff. Default is 0 (does
+not run single-effect SuSiE). Passing a negative value sets the cutoff
+to 3/number of variants.</li>
+<li><strong><code>pip_cutoff_to_skip_sumstat</code></strong>: Integer
+vector; Cutoff values for skipping analysis based on pre-screening with
+single-effect SuSiE (L=1). Sumstat is skipped if none of the variants in
+the sumstat have PIP values greater than the cutoff. Default is 0 (does
+not run single-effect SuSiE). Passing a negative value sets the cutoff
+to 3/number of variants.</li>
+<li><strong><code>qc_method</code></strong>: String; Quality control
+method to use. Options are “rss_qc”, “dentist”, or “slalom”. Default is
+<code>rss_qc</code>.</li>
+<li><strong><code>impute</code></strong>: Logical; if TRUE, performs
+imputation for outliers identified in the analysis. Default is
+<code>TRUE</code>.</li>
+<li><strong><code>impute_opts</code></strong>: List of lists; Imputation
+options including rcond, R2_threshold, and minimum_ld. Default is
+<code>list(rcond = 0.01, R2_threshold = 0.6, minimum_ld = 5)</code>.</li>
+<li><strong><code>xqtl_coloc</code></strong>: Logical; if TRUE, performs
+xQTL-only mode. Default is <code>TRUE</code>.</li>
+<li><strong><code>joint_gwas</code></strong>: Logical; if TRUE, performs
+joint GWAS mode, mapping all individual-level and sumstat data
+together.Default is <code>FALSE</code>.</li>
+<li><strong><code>separate_gwas</code></strong>: Logical; if TRUE, runs
+separate GWAS mode, where each sumstat dataset is analyzed separately
+with all individual-level data, treating each sumstat as the focal trait
+in disease-prioritized mode. Default is <code>FALSE</code>.</li>
+</ul>
+<p>Outputs:</p>
+<ul>
+<li><strong><code>colocboost_results</code></strong>: List of colocboost
+objects (with <code>xqtl_coloc</code>, <code>joint_gwas</code>,
+<code>separate_gwas</code>); Output of the
+<code>colocboost_analysis_pipeline</code> function. If the mode is not
+run, the corresponding element will be <code>NULL</code>.</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="do">#### Please check the example code below ####</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># # load in individual-level and sumstat data</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>region_data_combined <span class="ot">&lt;-</span> <span class="fu">load_multitask_regional_data</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    <span class="at">region =</span> region,</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>    <span class="at">genotype_list =</span> genotype_list,</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>    <span class="at">phenotype_list =</span> phenotype_list,</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>    <span class="at">covariate_list =</span> covariate_list,</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>    <span class="at">conditions_list_individual =</span> conditions_list_individual,</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>    <span class="at">match_geno_pheno =</span> match_geno_pheno,</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>    <span class="at">association_window =</span> association_window,</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>    <span class="at">region_name_col =</span> region_name_col,</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>    <span class="at">extract_region_name =</span> extract_region_name,</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>    <span class="at">keep_indel =</span> keep_indel,</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>    <span class="at">keep_samples =</span> keep_samples,</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>    <span class="at">maf_cutoff =</span> maf_cutoff,</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>    <span class="at">mac_cutoff =</span> mac_cutoff,</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>    <span class="at">xvar_cutoff =</span> xvar_cutoff,</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>    <span class="at">imiss_cutoff =</span> imiss_cutoff,</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>    <span class="at">sumstat_path_list =</span> sumstat_path_list,</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>    <span class="at">column_file_path_list =</span> column_file_path_list,</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>    <span class="at">LD_meta_file_path_list =</span> LD_meta_file_path_list,</span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>    <span class="at">conditions_list_sumstat =</span> conditions_list_sumstat,</span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>    <span class="at">match_LD_sumstat =</span> match_LD_sumstat,</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>    <span class="at">n_samples =</span> n_samples,</span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>    <span class="at">n_cases =</span> n_cases,</span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>    <span class="at">n_controls =</span> n_controls</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>)</span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>maf_cutoff <span class="ot">=</span> <span class="fl">0.01</span></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a>pip_cutoff_to_skip_ind <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="fu">length</span>(phenotype_list))</span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a>pip_cutoff_to_skip_sumstat <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="fu">length</span>(sumstat_path_list))</span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a>qc_method <span class="ot">=</span> <span class="st">&quot;rss_qc&quot;</span> </span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co"># run colocboost analysis</span></span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a>colocboost_results <span class="ot">&lt;-</span> <span class="fu">colocboost_analysis_pipeline</span>(</span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>    region_data_combined,</span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a>    <span class="at">maf_cutoff =</span> maf_cutoff, </span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a>    <span class="at">pip_cutoff_to_skip_ind =</span> pip_cutoff_to_skip_ind,</span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>    <span class="at">pip_cutoff_to_skip_sumstat =</span> pip_cutoff_to_skip_sumstat,</span>
+<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a>    <span class="at">qc_method =</span> qc_method,</span>
+<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a>    <span class="at">xqtl_coloc =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a>    <span class="at">joint_gwas =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a>    <span class="at">separate_gwas =</span> <span class="cn">TRUE</span></span>
+<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a>)</span>
+<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a><span class="co"># visualize results for xQTL-only mode</span></span>
+<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a><span class="fu">colocboost_plot</span>(colocboost_results<span class="sc">$</span>xqtl_coloc)</span>
+<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a></span>
+<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a><span class="co"># visualize results for joint GWAS mode</span></span>
+<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a><span class="fu">colocboost_plot</span>(colocboost_results<span class="sc">$</span>joint_gwas)</span>
+<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a></span>
+<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a><span class="co"># visualize results for separate GWAS mode</span></span>
+<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(colocboost_results<span class="sc">$</span>separate_gwas)) {</span>
+<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a>    <span class="fu">colocboost_plot</span>(colocboost_results<span class="sc">$</span>separate_gwas[[i]])</span>
+<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 
 

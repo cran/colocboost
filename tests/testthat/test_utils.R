@@ -19,12 +19,12 @@ generate_test_result <- function(n = 100, p = 20, L = 2, seed = 42) {
   
   if (L == 1) {
     # Single trait case
-    true_beta[5, 1] <- 0.7  # SNP5 affects the trait
-    true_beta[10, 1] <- 0.6 # SNP10 also affects the trait
+    true_beta[5, 1] <- 1  # SNP5 affects the trait
+    true_beta[10, 1] <- 1 # SNP10 also affects the trait
   } else {
     # Multi-trait case
-    true_beta[5, 1] <- 0.7  # SNP5 affects trait 1
-    true_beta[5, 2] <- 0.6  # SNP5 also affects trait 2 (colocalized)
+    true_beta[5, 1] <- 1  # SNP5 affects trait 1
+    true_beta[5, 2] <- 1  # SNP5 also affects trait 2 (colocalized)
     true_beta[10, 2] <- 0.5 # SNP10 only affects trait 2
   }
   
@@ -85,12 +85,12 @@ test_that("w_cs correctly identifies confidence set for weight vector", {
   result <- w_cs(w, coverage = 0.8)
   
   # Expected result for 80% coverage: w[1] + w[2] = 0.8, so first 2 elements should be 1
-  expected <- c(1, 1, 0, 0)
+  expected <- c(1,2)
   expect_equal(result, expected)
   
   # Test with different coverage
   result2 <- w_cs(w, coverage = 0.9)
-  expected2 <- c(1, 1, 1, 1)  # First 4 elements cover 90% since 3 and 4 with the same 0.1 weight 
+  expected2 <- c(1,2,3,4)  # First 4 elements cover 90% since 3 and 4 with the same 0.1 weight 
   expect_equal(result2, expected2)
 })
 
@@ -490,7 +490,7 @@ test_that("get_merge_ordered_with_indices handles conflicting variable orders co
 test_that("get_merge_ordered_with_indices handles edge cases", {
   
   # Test with NULL inputs
-  expect_equal(get_merge_ordered_with_indices(list()), character(0))
+  expect_equal(get_merge_ordered_with_indices(list()), NULL)
   
   # Test with single vector
   expect_equal(get_merge_ordered_with_indices(list(c("A", "B", "C"))), c("A", "B", "C"))
