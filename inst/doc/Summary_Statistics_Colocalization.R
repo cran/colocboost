@@ -32,6 +32,16 @@ res$cos_details$cos$cos_index
 # Plotting the results
 colocboost_plot(res)
 
+## ----one-X-ref----------------------------------------------------------------
+# Use reference genotype directly instead of precomputing LD
+X_ref <- Ind_5traits$X[[1]]
+
+# Run colocboost
+res <- colocboost(sumstat = Sumstat_5traits$sumstat, X_ref = X_ref)
+
+# Identified CoS
+res$cos_details$cos$cos_index
+
 ## ----matched-LD---------------------------------------------------------------
 # Duplicate LD with matched summary statistics
 LD_multiple <- lapply(1:length(Sumstat_5traits$sumstat), function(i) LD )
@@ -63,6 +73,17 @@ dict_sumstatLD
 
 # Run colocboost
 res <- colocboost(sumstat = Sumstat_5traits$sumstat, LD = LD_arbitrary, dict_sumstatLD = dict_sumstatLD)
+
+# Identified CoS
+res$cos_details$cos$cos_index
+
+## ----x-ref-example------------------------------------------------------------
+# Use genotype matrix directly as reference panel
+data("Ind_5traits")
+X_ref <- Ind_5traits$X[[1]]
+
+# Run colocboost with X_ref instead of LD
+res <- colocboost(sumstat = Sumstat_5traits$sumstat, X_ref = X_ref)
 
 # Identified CoS
 res$cos_details$cos$cos_index

@@ -251,8 +251,22 @@ on <a href="https://CRAN.R-project.org/package=colocboost">CRAN</a>.</li>
 <div id="software-updates" class="section level2">
 <h2>Software updates</h2>
 <ul>
-<li><code>v1.0.7</code> (<strong>Important update</strong>) Improvements
-to ColocBoost (check out the full details in <a href="https://github.com/StatFunGen/colocboost/pull/116">PR</a> and <a href="https://github.com/StatFunGen/colocboost/pull/121">PR</a>).
+<li><code>v1.0.8</code> Improvements to summary-statistics workflows,
+trait-specific result filtering, and computational efficiency.
+<ul>
+<li>Added <code>X_ref</code> support as a memory-efficient alternative
+to precomputed LD matrices for large summary-statistics analyses.</li>
+<li>Added <code>get_robust_ucos</code> to recalibrate and summarize
+robust trait-specific, uncolocalized events.</li>
+<li>Improved computational efficiency for repeated matrix products in
+large reference-panel workflows.</li>
+<li>Improved plotting robustness for extreme association signals and
+coefficient or z-score displays.</li>
+<li>Minor robustness fixes for summary-statistics analyses with
+reference-panel or LD-free inputs.</li>
+</ul></li>
+<li><code>v1.0.7</code> Improvements to ColocBoost (check out the full
+details in <a href="https://github.com/StatFunGen/colocboost/pull/116">PR</a> and <a href="https://github.com/StatFunGen/colocboost/pull/121">PR</a>).
 <ul>
 <li>Enhanced <code>colocboost</code> main function with post-filtering
 and only keep the robust colocalization events.</li>

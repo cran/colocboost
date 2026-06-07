@@ -4,6 +4,26 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
+## ----colocboost-analysis-basic-qc, eval = FALSE-------------------------------
+# fit <- colocboost_analysis(
+#     X = X,
+#     Y = Y,
+#     dict_YX = dict_YX,
+#     sumstat = sumstat,
+#     X_ref = X_ref,
+#     dict_sumstatLD = dict_sumstatLD,
+#     outcome_names = outcome_names,
+#     missing_rate_thresh = 0.1,
+#     maf_cutoff = 0.0005,
+#     xvar_cutoff = 0,
+#     pip_cutoff_to_skip_ind = 0,
+#     qc_method = "none",
+#     keep_indel = TRUE,
+#     pip_cutoff_to_skip_sumstat = 0,
+#     impute = FALSE,
+#     variant_convention = "A2_A1"
+# )
+
 ## ----data-loader-individual, eval = FALSE-------------------------------------
 # # Example of loading individual-level data
 # region = "chr1:1000000-2000000"
@@ -107,7 +127,7 @@ knitr::opts_chunk$set(
 # qc_method = "rss_qc"
 # 
 # # run colocboost analysis
-# colocboost_results <- colocboost_analysis_pipeline(
+# colocboost_results <- colocboost_pipeline(
 #     region_data_combined,
 #     maf_cutoff = maf_cutoff,
 #     pip_cutoff_to_skip_ind = pip_cutoff_to_skip_ind,
