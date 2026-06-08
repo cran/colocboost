@@ -1,4 +1,4 @@
-8e481f887c05b2070bf7d66ac657e924 *DESCRIPTION
+76570ee2a72095fe81217000033b835f *DESCRIPTION
 ee99b5ca48aaa1fe0d01a024867f42a4 *LICENSE
 dc82d9f7d852009911e5341c5c692f8a *NAMESPACE
 7e021d62e18aed45b7bbc66501f0aa05 *R/colocboost.R
@@ -43,7 +43,7 @@ b624095f2e023ae7de6073e85117d1f1 *inst/doc/FineBoost_Special_Case.Rmd
 67cd030394f8eab304e10821ce23c4c5 *inst/doc/FineBoost_Special_Case.html
 a871bf0eb64a1a65dd3f3650085a9ed9 *inst/doc/Individual_Level_Colocalization.R
 1af41e7f9a705cee728f12654bf6db6c *inst/doc/Individual_Level_Colocalization.Rmd
-bb3ae8cf9684e1b8a998dc3fdc0d31c8 *inst/doc/Individual_Level_Colocalization.html
+df1bffcda65f7f8592075263ef6a1a39 *inst/doc/Individual_Level_Colocalization.html
 20b04d50a550a8585580958f4e63de88 *inst/doc/Input_Data_Format.R
 42bff156676f67f31a8f695397a86588 *inst/doc/Input_Data_Format.Rmd
 ba868e7018a9a34266c939df163bc00c *inst/doc/Input_Data_Format.html
@@ -65,8 +65,8 @@ f6b2fa227ebb5812b5dcf5437368338b *inst/doc/Summary_Statistics_Colocalization.R
 5dc6e759ee46a65e6e1e610fd3648ac0 *inst/doc/Visualization_ColocBoost_Output.R
 417323f51ba9266ed2459da7c45597ab *inst/doc/Visualization_ColocBoost_Output.Rmd
 42e4c121eabbc7635586122e6cfab86d *inst/doc/Visualization_ColocBoost_Output.html
-4e1b9bbe44f5ee8050ad90fea7853e0b *inst/doc/announcements.Rmd
-d5846a94efbb384bd280d9d2bd39514f *inst/doc/announcements.html
+c3114b7e9613176d3731b41afe987cca *inst/doc/announcements.Rmd
+6283b34b0bad017f6756cbc942f33690 *inst/doc/announcements.html
 5e270ae6034b339c2a13d20a5f7d2dec *inst/doc/installation.R
 bfdb1a3a5846fbefe4cd7a42bc44f371 *inst/doc/installation.Rmd
 c2a934626fcfa8f6d24a490a804a3bd2 *inst/doc/installation.html
@@ -103,7 +103,7 @@ e4c0c2fbeb6a73ec27962d916ea5dcfb *tests/testthat/test_RE.R
 06828659f7e09c73ec2e0f2ca68da426 *tests/testthat/test_Xref.R
 3c37dad04b59e78a2ef312337e989d5b *tests/testthat/test_colocboost.R
 d33d66904463587f2a6567375dc63db1 *tests/testthat/test_corner_cases.R
-715a573aa1430a4991b94c9be8b00b5f *tests/testthat/test_inference.R
+82e31e7aec62d233f8dd0c90577d88bd *tests/testthat/test_inference.R
 7cf51efd4dc724f3508902d2073a2a21 *tests/testthat/test_model.R
 a6d044b421c5334bc9c92149ac5200ac *tests/testthat/test_one_causal.R
 cee0e99f5f0588cd22ae7062eecc5102 *tests/testthat/test_optimization_phase1.R
@@ -123,5 +123,5 @@ bdeccf2d983c255faa32edbbf34a262d *vignettes/LD_Free_Colocalization.Rmd
 285c593639af45a1284217078306daa1 *vignettes/Partial_Overlap_Variants.Rmd
 3e2640fb14efbae8a4b818477bbdc0ce *vignettes/Summary_Statistics_Colocalization.Rmd
 417323f51ba9266ed2459da7c45597ab *vignettes/Visualization_ColocBoost_Output.Rmd
-4e1b9bbe44f5ee8050ad90fea7853e0b *vignettes/announcements.Rmd
+c3114b7e9613176d3731b41afe987cca *vignettes/announcements.Rmd
 bfdb1a3a5846fbefe4cd7a42bc44f371 *vignettes/installation.Rmd
